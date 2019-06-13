@@ -45,33 +45,33 @@ function getFunctionName(){
     // Android 5: hook OpenMemory
     // after Android 5: hook OpenCommon
     if(getAndroidVersion() > 4){ // android 5 and lasted version
-        var artImports =  Module.enumerateExportsSync("libart.so");
-        for(i = 0; i< artImports.length; i++){
-            if(artImports[i].name.indexOf("OpenMemory") !== -1){
-                functionName = artImports[i].name;
+        var artExports =  Module.enumerateExportsSync("libart.so");
+        for(i = 0; i< artExports.length; i++){
+            if(artExports[i].name.indexOf("OpenMemory") !== -1){
+                functionName = artExports[i].name;
                 LogPrint("index " + i + " function name: "+ functionName);
                 break;
-            }else if(artImports[i].name.indexOf("OpenCommon") !== -1){
-                functionName = artImports[i].name;
+            }else if(artExports[i].name.indexOf("OpenCommon") !== -1){
+                functionName = artExports[i].name;
                 LogPrint("index " + i + " function name: "+ functionName);
                 break;
             }
         }
     }else{ //android 4
-        var dvmImports =  Module.enumerateExportsSync("libdvm.so");
-        if(dvmImports.length !== 0){  // check libdvm.so first
-            for(i = 0; i< dvmImports.length; i++){
-                if(dvmImports[i].name.indexOf("dexFileParse") !== -1){
-                    functionName = dvmImports[i].name;
+        var dvmExports =  Module.enumerateExportsSync("libdvm.so");
+        if(dvmExports.length !== 0){  // check libdvm.so first
+            for(i = 0; i< dvmExports.length; i++){
+                if(dvmExports[i].name.indexOf("dexFileParse") !== -1){
+                    functionName = dvmExports[i].name;
                     LogPrint("index " + i + " function name: "+ functionName);
                     break;
                 }
             }
         }else{ // if not load libdvm.so, check libart.so
-            dvmImports = Module.enumerateExportsSync("libart.so");
-            for(i = 0; i< dvmImports.length; i++){
-                if(dvmImports[i].name.indexOf("OpenMemory") !== -1){
-                    functionName = dvmImports[i].name;
+            dvmExports = Module.enumerateExportsSync("libart.so");
+            for(i = 0; i< dvmExports.length; i++){
+                if(dvmExports[i].name.indexOf("OpenMemory") !== -1){
+                    functionName = dvmExports[i].name;
                     LogPrint("index " + i + " function name: "+ functionName);
                     break;
                 }
