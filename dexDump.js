@@ -5,7 +5,7 @@
  * Create: 2019/6/11
  * Dump dex file for packaged apk
  * Hook art/runtime/dex_file.cc OpenMemory or OpenCommon
- * Support Version: Android 5.0 and later versions
+ * Support Version: Android 4.4 and later versions
  */
 
 function LogPrint(log) {
