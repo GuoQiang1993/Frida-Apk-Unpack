@@ -116,19 +116,33 @@ function arraybuffer2hexstr(buffer)
 }
 
 function checkDexMagic(dataAddr){
+    var checkHeadHexStr = "64 65 78 0a";
     var magicFlagHexStr = "64 65 78 0a 30 33 35 00";
 
-    var magicBuff = Memory.readByteArray(dataAddr, 8);
+    var magicBuff = Memory.readByteArray(dataAddr, 4);
     var magicBuffHexStr = arraybuffer2hexstr(magicBuff);
+
+    if(magicBuffHexStr === checkHeadHexStr){
+        magicBuff = Memory.readByteArray(dataAddr, 8);
+        magicBuffHexStr = arraybuffer2hexstr(magicBuff);
+    }
+
     LogPrint("check dex magicBuffHexStr: " + magicBuffHexStr);
     return magicFlagHexStr === magicBuffHexStr;
 }
 
 function checkOdexMagic(dataAddr){
+    var checkHeadHexStr = "64 65 79 0a";
     var magicFlagHexStr = "64 65 79 0a 30 33 36 00";
 
-    var magicBuff = Memory.readByteArray(dataAddr, 8);
+    var magicBuff = Memory.readByteArray(dataAddr, 4);
     var magicBuffHexStr = arraybuffer2hexstr(magicBuff);
+
+    if(magicBuffHexStr === checkHeadHexStr){
+        magicBuff = Memory.readByteArray(dataAddr, 8);
+        magicBuffHexStr = arraybuffer2hexstr(magicBuff);
+    }
+
     LogPrint("check odex magicBuffHexStr: " + magicBuffHexStr);
     return magicFlagHexStr === magicBuffHexStr;
 }
