@@ -116,35 +116,31 @@ function arraybuffer2hexstr(buffer)
 }
 
 function checkDexMagic(dataAddr){
-    var checkHeadHexStr = "64 65 78 0a";
-    var magicFlagHexStr = "64 65 78 0a 30 33 35 00";
+    var magicMatch = true;
+    var magicFlagHex = [0x64, 0x65, 0x78, 0x0a, 0x30, 0x33, 0x35, 0x00];
 
-    var magicBuff = Memory.readByteArray(dataAddr, 4);
-    var magicBuffHexStr = arraybuffer2hexstr(magicBuff);
-
-    if(magicBuffHexStr === checkHeadHexStr){
-        magicBuff = Memory.readByteArray(dataAddr, 8);
-        magicBuffHexStr = arraybuffer2hexstr(magicBuff);
+    for(var i = 0; i< 8; i++){
+        if(Memory.readU8(ptr(dataAddr).add(i)) !== magicFlagHex[i]){
+            magicMatch = false;
+            break;
+        }
     }
 
-    LogPrint("check dex magicBuffHexStr: " + magicBuffHexStr);
-    return magicFlagHexStr === magicBuffHexStr;
+    return magicMatch;
 }
 
 function checkOdexMagic(dataAddr){
-    var checkHeadHexStr = "64 65 79 0a";
-    var magicFlagHexStr = "64 65 79 0a 30 33 36 00";
+    var magicMatch = true;
+    var magicFlagHex = [0x64, 0x65, 0x79, 0x0a, 0x30, 0x33, 0x36, 0x00];
 
-    var magicBuff = Memory.readByteArray(dataAddr, 4);
-    var magicBuffHexStr = arraybuffer2hexstr(magicBuff);
-
-    if(magicBuffHexStr === checkHeadHexStr){
-        magicBuff = Memory.readByteArray(dataAddr, 8);
-        magicBuffHexStr = arraybuffer2hexstr(magicBuff);
+    for(var i = 0; i< 8; i++){
+        if(Memory.readU8(ptr(dataAddr).add(i)) !== magicFlagHex[i]){
+            magicMatch = false;
+            break;
+        }
     }
 
-    LogPrint("check odex magicBuffHexStr: " + magicBuffHexStr);
-    return magicFlagHexStr === magicBuffHexStr;
+    return magicMatch;
 }
 
 function dumpDex(moduleFuncName, processName){
