@@ -119,7 +119,7 @@ function checkDexMagic(dataAddr){
     var magicMatch = true;
     var magicFlagHex = [0x64, 0x65, 0x78, 0x0a, 0x30, 0x33, 0x35, 0x00];
 
-    for(var i = 0; i< 8; i++){
+    for(var i = 0; i < 8; i++){
         if(Memory.readU8(ptr(dataAddr).add(i)) !== magicFlagHex[i]){
             magicMatch = false;
             break;
@@ -133,7 +133,7 @@ function checkOdexMagic(dataAddr){
     var magicMatch = true;
     var magicFlagHex = [0x64, 0x65, 0x79, 0x0a, 0x30, 0x33, 0x36, 0x00];
 
-    for(var i = 0; i< 8; i++){
+    for(var i = 0; i < 8; i++){
         if(Memory.readU8(ptr(dataAddr).add(i)) !== magicFlagHex[i]){
             magicMatch = false;
             break;
