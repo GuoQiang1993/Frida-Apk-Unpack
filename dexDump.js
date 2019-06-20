@@ -217,8 +217,8 @@ function dumpDex(moduleFuncName, processName){
 }
 
 //start dump dex file
-var moduleFucntionname = getFunctionName();
+var moduleFucntionName = getFunctionName();
 var processName = getProcessName();
-if(moduleFucntionname !== "" && processName !== ""){
-    dumpDex(moduleFucntionname, processName);
+if(moduleFucntionName !== "" && processName !== ""){
+    dumpDex(moduleFucntionName, processName);
 }
