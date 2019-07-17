@@ -28,7 +28,7 @@ frida环境搭建，参考frida官网：frida。
 
 0x3 适用环境
 ----
-普通加固可以脱壳,对于类抽取等商业加固脱出的只是个空壳，需要做指令Dump以及Patch到脱出的Dex文件中,Android4.4测试某加密可以脱,某60只能脱出odex
+普通加固可以脱壳,对于类抽取等加固脱出的只是个空壳，需要做指令Dump以及Patch到脱出的Dex文件中
 
 0x4 参考链接
 ----
@@ -37,3 +37,7 @@ https://www.frida.re/docs/home/
 https://github.com/dstmath/frida-unpack
 
 https://github.com/xiaokanghub/Frida-Android-unpack
+
+0x5 声明
+----
+本工具仅用于学习交流，不得用于违法行为，如作他用所承受的法律责任一概与作者无关（下载使用即代表你同意上述观点）
