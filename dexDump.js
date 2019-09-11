@@ -44,7 +44,7 @@ function getFunctionName(){
     // Android 4: hook dvmDexFileOpenPartial
     // Android 5: hook OpenMemory
     // after Android 5: hook OpenCommon
-    if(getAndroidVersion() > 4){ // android 5 and lasted version
+    if(getAndroidVersion() > 4){ // android 5 and later version
         var artExports =  Module.enumerateExportsSync("libart.so");
         for(i = 0; i< artExports.length; i++){
             if(artExports[i].name.indexOf("OpenMemory") !== -1){
@@ -146,7 +146,7 @@ function checkOdexMagic(dataAddr){
 function dumpDex(moduleFuncName, processName){
     if(moduleFuncName !== ""){
         var hookFunction;
-        if(getAndroidVersion() > 4){ // android 5 and lasted version
+        if(getAndroidVersion() > 4){ // android 5 and later version
             hookFunction = Module.findExportByName("libart.so", moduleFuncName);
         }else{ // android 4
             hookFunction = Module.findExportByName("libdvm.so", moduleFuncName);  // check libdvm.so first
