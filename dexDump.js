@@ -88,6 +88,8 @@ function getProcessName(){
     var fopenFunc = new NativeFunction(fopenPtr, 'pointer', ['pointer', 'pointer']);
     var fgetsPtr = Module.findExportByName("libc.so", "fgets");
     var fgetsFunc = new NativeFunction(fgetsPtr, 'int', ['pointer', 'int', 'pointer']);
+    var fclosePtr = Module.findExportByName("libc.so", "fclose");
+    var fcloseFunc = new NativeFunction(fclosePtr, 'int', ['pointer']);
 
     var pathPtr = Memory.allocUtf8String("/proc/self/cmdline");
     var openFlagsPtr = Memory.allocUtf8String("r");
@@ -100,6 +102,7 @@ function getProcessName(){
             processName = Memory.readCString(buffData);
             LogPrint("processName " + processName);
         }
+        fcloseFunc(fp);
     }
     return processName;
 }
