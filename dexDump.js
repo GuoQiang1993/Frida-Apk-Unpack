@@ -28,8 +28,7 @@ function getAndroidVersion(){
     var version = 0;
 
     if(Java.available){
-        var versionStr = Java.androidVersion;
-        version = versionStr.slice(0,1);
+        var version = parseInt(Java.androidVersion);
     }else{
         LogPrint("Error: cannot get android version");
     }
