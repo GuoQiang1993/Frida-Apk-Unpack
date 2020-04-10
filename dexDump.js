@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Author: guoqiangck
+ * Author: guoqiangck & enovella
  * Created: 2019/6/11
  * Dump dex file for packed apks
  * Hook art/runtime/dex_file.cc OpenMemory or OpenCommon
@@ -58,7 +58,7 @@ function getFunctionName(){
         }
     }else{ //android 4
         var dvmExports =  Module.enumerateExportsSync("libdvm.so");
-        if(dvmExports.length !== 0){  // check libdvm.so first
+        if (dvmExports.length !== 0) {
             for(i = 0; i< dvmExports.length; i++){
                 if(dvmExports[i].name.indexOf("dexFileParse") !== -1){
                     functionName = dvmExports[i].name;
@@ -66,7 +66,7 @@ function getFunctionName(){
                     break;
                 }
             }
-        }else{ // if not load libdvm.so, check libart.so
+        }else {
             dvmExports = Module.enumerateExportsSync("libart.so");
             for(i = 0; i< dvmExports.length; i++){
                 if(dvmExports[i].name.indexOf("OpenMemory") !== -1){
@@ -84,10 +84,11 @@ function getProcessName(){
     var processName = "";
 
     var fopenPtr = Module.findExportByName("libc.so", "fopen");
-    var fopenFunc = new NativeFunction(fopenPtr, 'pointer', ['pointer', 'pointer']);
     var fgetsPtr = Module.findExportByName("libc.so", "fgets");
-    var fgetsFunc = new NativeFunction(fgetsPtr, 'int', ['pointer', 'int', 'pointer']);
     var fclosePtr = Module.findExportByName("libc.so", "fclose");
+
+    var fopenFunc = new NativeFunction(fopenPtr, 'pointer', ['pointer', 'pointer']);
+    var fgetsFunc = new NativeFunction(fgetsPtr, 'int', ['pointer', 'int', 'pointer']);
     var fcloseFunc = new NativeFunction(fclosePtr, 'int', ['pointer']);
 
     var pathPtr = Memory.allocUtf8String("/proc/self/cmdline");
@@ -144,6 +145,7 @@ function checkOdexMagic(dataAddr){
 
     return magicMatch;
 }
+
 function dumpDexToFile(isDex, begin, processName) {
     //console.log(hexdump(begin, { offset: 0, header: false, length: 64, ansi: false }));
     var dexType;
@@ -181,33 +183,33 @@ function dumpDex(moduleFuncName, processName){
                 var odexMagicMatch = false;
 
                 dexMagicMatch = checkDexMagic(args[0]);
-                if(dexMagicMatch === true){
+                if (dexMagicMatch === true){
                     begin = args[0];
-                }else{
+                }else {
                     odexMagicMatch = checkOdexMagic(args[0]);
-                    if(odexMagicMatch === true){
+                    if (odexMagicMatch === true) {
                         begin = args[0];
                     }
                 }
 
-                if(begin === 0){
+                if (begin === 0){
                     dexMagicMatch = checkDexMagic(args[1]);
-                    if(dexMagicMatch === true){
+                    if(dexMagicMatch === true) {
                         begin = args[1];
                     }else{
                       odexMagicMatch = checkOdexMagic(args[1]);
-                      if(odexMagicMatch === true){
+                      if(odexMagicMatch === true) {
                           begin = args[1];
                       }
                     }
                 }
-                if(dexMagicMatch === true){
+                if (dexMagicMatch === true) {
                     dumpDexToFile(dexMagicMatch, begin, processName);
-                } else if(odexMagicMatch === true){
+                } else if(odexMagicMatch === true) {
                     dumpDexToFile(odexMagicMatch, begin, processName);
                 }
             },
-            onLeave: function(retval){
+            onLeave: function(retval) {
             }
         });
     }else{
