@@ -144,12 +144,12 @@ function checkOdexMagic(dataAddr){
 
     return magicMatch;
 }
-function dumpDexToFile(isDex,begin,processName) {
+function dumpDexToFile(isDex, begin, processName) {
     //console.log(hexdump(begin, { offset: 0, header: false, length: 64, ansi: false }));
     var dexType;
     isDex ? dexType = "dex" : dexType = "odex";
     var magic = Memory.readUtf8String(begin).replace(/\n/g, '');
-    var address = ptr(begin).add(isDex?0x20:0x1C);
+    var address = ptr(begin).add(isDex ? 0x20 : 0x1C);
     var dex_size = Memory.readInt(ptr(address));
     var dex_path = "/data/data/" + processName + "/" + dex_size + "." + dexType;
     var dex_file = new File(dex_path, "wb");
@@ -166,12 +166,12 @@ function dumpDexToFile(isDex,begin,processName) {
 function dumpDex(moduleFuncName, processName){
     if(moduleFuncName !== ""){
         var hookFunction;
-        if(getAndroidVersion() > 4){ // android 5 and later version
+        if(getAndroidVersion() > 4){
             hookFunction = Module.findExportByName("libart.so", moduleFuncName);
-        }else{ // android 4
-            hookFunction = Module.findExportByName("libdvm.so", moduleFuncName);  // check libdvm.so first
+        }else{
+            hookFunction = Module.findExportByName("libdvm.so", moduleFuncName);
             if(hookFunction == null) {
-                hookFunction = Module.findExportByName("libart.so", moduleFuncName); //// if not load libdvm.so, check libart.so
+                hookFunction = Module.findExportByName("libart.so", moduleFuncName);
             }
         }
         Interceptor.attach(hookFunction,{
@@ -215,9 +215,10 @@ function dumpDex(moduleFuncName, processName){
     }
 }
 
-//start dump dex file
+// Main code
 var moduleFucntionName = getFunctionName();
 var processName = getProcessName();
+
 if(moduleFucntionName !== "" && processName !== ""){
     dumpDex(moduleFucntionName, processName);
 }
