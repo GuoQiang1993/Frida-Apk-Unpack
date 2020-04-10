@@ -33,7 +33,7 @@ function getAndroidVersion(){
     }else{
         logPrint("Error: cannot get android version");
     }
-    logPrint("Android Version: " + version);
+    logPrint("[*] Android version: " + version);
 
     return version;
 }
@@ -50,11 +50,11 @@ function getFunctionName(){
         for(i = 0; i< artExports.length; i++){
             if(artExports[i].name.indexOf("OpenMemory") !== -1){
                 functionName = artExports[i].name;
-                logPrint("index " + i + " function name: "+ functionName);
+                logPrint("[*] Export index: " + i + " -> "+ functionName);
                 break;
             }else if(artExports[i].name.indexOf("OpenCommon") !== -1){
                 functionName = artExports[i].name;
-                logPrint("index " + i + " function name: "+ functionName);
+                logPrint("[*] Export index: " + i + " -> "+ functionName);
                 break;
             }
         }
@@ -64,7 +64,7 @@ function getFunctionName(){
             for(i = 0; i< dvmExports.length; i++){
                 if(dvmExports[i].name.indexOf("dexFileParse") !== -1){
                     functionName = dvmExports[i].name;
-                    logPrint("index " + i + " function name: "+ functionName);
+                    logPrint("[*] Export index: " + i + " -> "+ functionName);
                     break;
                 }
             }
@@ -73,7 +73,7 @@ function getFunctionName(){
             for(i = 0; i< dvmExports.length; i++){
                 if(dvmExports[i].name.indexOf("OpenMemory") !== -1){
                     functionName = dvmExports[i].name;
-                    logPrint("index " + i + " function name: "+ functionName);
+                    logPrint("[*] Export index: " + i + " -> "+ functionName);
                     break;
                 }
             }
@@ -102,7 +102,7 @@ function getg_processName(){
         var ret = fgetsFunc(buffData, 128, fp);
         if(ret !== 0){
             g_processName = Memory.readCString(buffData);
-            logPrint("g_processName " + g_processName);
+            logPrint("[*] ProcessName: " + g_processName);
         }
         fcloseFunc(fp);
     }
