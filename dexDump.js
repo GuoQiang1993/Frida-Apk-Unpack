@@ -2,13 +2,13 @@
 
 /**
  * Author: guoqiangck
- * Create: 2019/6/11
- * Dump dex file for packaged apk
+ * Created: 2019/6/11
+ * Dump dex file for packed apks
  * Hook art/runtime/dex_file.cc OpenMemory or OpenCommon
- * Support Version: Android 4.4 and later versions
+ * Support Version: Android 4.4 up to Android 9.0
  */
 
-function LogPrint(log) {
+function logPrint(log) {
     var theDate = new Date();
     var hour = theDate.getHours();
     var minute = theDate.getMinutes();
@@ -30,9 +30,9 @@ function getAndroidVersion(){
     if(Java.available){
         var version = parseInt(Java.androidVersion);
     }else{
-        LogPrint("Error: cannot get android version");
+        logPrint("Error: cannot get android version");
     }
-    LogPrint("Android Version: " + version);
+    logPrint("Android Version: " + version);
     return version;
 }
 
@@ -48,11 +48,11 @@ function getFunctionName(){
         for(i = 0; i< artExports.length; i++){
             if(artExports[i].name.indexOf("OpenMemory") !== -1){
                 functionName = artExports[i].name;
-                LogPrint("index " + i + " function name: "+ functionName);
+                logPrint("index " + i + " function name: "+ functionName);
                 break;
             }else if(artExports[i].name.indexOf("OpenCommon") !== -1){
                 functionName = artExports[i].name;
-                LogPrint("index " + i + " function name: "+ functionName);
+                logPrint("index " + i + " function name: "+ functionName);
                 break;
             }
         }
@@ -62,7 +62,7 @@ function getFunctionName(){
             for(i = 0; i< dvmExports.length; i++){
                 if(dvmExports[i].name.indexOf("dexFileParse") !== -1){
                     functionName = dvmExports[i].name;
-                    LogPrint("index " + i + " function name: "+ functionName);
+                    logPrint("index " + i + " function name: "+ functionName);
                     break;
                 }
             }
@@ -71,7 +71,7 @@ function getFunctionName(){
             for(i = 0; i< dvmExports.length; i++){
                 if(dvmExports[i].name.indexOf("OpenMemory") !== -1){
                     functionName = dvmExports[i].name;
-                    LogPrint("index " + i + " function name: "+ functionName);
+                    logPrint("index " + i + " function name: "+ functionName);
                     break;
                 }
             }
@@ -99,7 +99,7 @@ function getProcessName(){
         var ret = fgetsFunc(buffData, 128, fp);
         if(ret !== 0){
             processName = Memory.readCString(buffData);
-            LogPrint("processName " + processName);
+            logPrint("processName " + processName);
         }
         fcloseFunc(fp);
     }
@@ -144,6 +144,24 @@ function checkOdexMagic(dataAddr){
 
     return magicMatch;
 }
+function dumpDexToFile(isDex,begin,processName) {
+    //console.log(hexdump(begin, { offset: 0, header: false, length: 64, ansi: false }));
+    var dexType;
+    isDex ? dexType = "dex" : dexType = "odex";
+    var magic = Memory.readUtf8String(begin).replace(/\n/g, '');
+    var address = ptr(begin).add(isDex?0x20:0x1C);
+    var dex_size = Memory.readInt(ptr(address));
+    var dex_path = "/data/data/" + processName + "/" + dex_size + "." + dexType;
+    var dex_file = new File(dex_path, "wb");
+
+    dex_file.write(Memory.readByteArray(begin, dex_size));
+    dex_file.flush();
+    dex_file.close();
+
+    logPrint("magic : " + magic );
+    logPrint(dexType + "_size :" + dex_size);
+    logPrint("dump " + dexType + " success, saved path: " + dex_path + "\n");
+}
 
 function dumpDex(moduleFuncName, processName){
     if(moduleFuncName !== ""){
@@ -183,38 +201,17 @@ function dumpDex(moduleFuncName, processName){
                       }
                     }
                 }
-
                 if(dexMagicMatch === true){
-                    LogPrint("magic : " + Memory.readUtf8String(begin));
-                    //console.log(hexdump(begin, { offset: 0, header: false, length: 64, ansi: false }));
-                    var address = parseInt(begin,16) + 0x20;
-                    var dex_size = Memory.readInt(ptr(address));
-                    LogPrint("dex_size :" + dex_size);
-                    var dex_path = "/data/data/" + processName + "/" + dex_size + ".dex";
-                    var dex_file = new File(dex_path, "wb");
-                    dex_file.write(Memory.readByteArray(begin, dex_size));
-                    dex_file.flush();
-                    dex_file.close();
-                    LogPrint("dump dex success, saved path: " + dex_path + "\n");
-                }else if(odexMagicMatch === true){
-                    LogPrint("magic : " + Memory.readUtf8String(begin));
-                    //console.log(hexdump(begin, { offset: 0, header: false, length: 64, ansi: false }));
-                    var address = parseInt(begin,16) + 0x0C;
-                    var odex_size = Memory.readInt(ptr(address));
-                    LogPrint("odex_size :" + odex_size);
-                    var odex_path = "/data/data/" + processName + "/" + odex_size + ".odex";
-                    var odex_file = new File(odex_path, "wb");
-                    odex_file.write(Memory.readByteArray(begin, odex_size));
-                    odex_file.flush();
-                    odex_file.close();
-                    LogPrint("dump odex success, saved path: " + odex_path + "\n");
+                    dumpDexToFile(dexMagicMatch, begin, processName);
+                } else if(odexMagicMatch === true){
+                    dumpDexToFile(odexMagicMatch, begin, processName);
                 }
             },
             onLeave: function(retval){
             }
         });
     }else{
-	    LogPrint("Error: cannot find correct module function.");
+	    logPrint("Error: cannot find correct module function.");
     }
 }
 
