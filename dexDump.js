@@ -8,6 +8,7 @@
  * Support Version: Android 4.4 up to Android 9.0
  */
 
+
 function logPrint(log) {
     var theDate = new Date();
     var hour = theDate.getHours();
@@ -33,6 +34,7 @@ function getAndroidVersion(){
         logPrint("Error: cannot get android version");
     }
     logPrint("Android Version: " + version);
+
     return version;
 }
 
@@ -43,7 +45,7 @@ function getFunctionName(){
     // Android 4: hook dvmDexFileOpenPartial
     // Android 5: hook OpenMemory
     // after Android 5: hook OpenCommon
-    if(getAndroidVersion() > 4){ // android 5 and later version
+    if (g_AndroidOSVersion > 4){ // android 5 and later version
         var artExports =  Module.enumerateExportsSync("libart.so");
         for(i = 0; i< artExports.length; i++){
             if(artExports[i].name.indexOf("OpenMemory") !== -1){
@@ -80,8 +82,8 @@ function getFunctionName(){
     return functionName;
 }
 
-function getProcessName(){
-    var processName = "";
+function getg_processName(){
+    var g_processName = "";
 
     var fopenPtr = Module.findExportByName("libc.so", "fopen");
     var fgetsPtr = Module.findExportByName("libc.so", "fgets");
@@ -99,12 +101,12 @@ function getProcessName(){
         var buffData = Memory.alloc(128);
         var ret = fgetsFunc(buffData, 128, fp);
         if(ret !== 0){
-            processName = Memory.readCString(buffData);
-            logPrint("processName " + processName);
+            g_processName = Memory.readCString(buffData);
+            logPrint("g_processName " + g_processName);
         }
         fcloseFunc(fp);
     }
-    return processName;
+    return g_processName;
 }
 
 function arraybuffer2hexstr(buffer)
@@ -146,14 +148,14 @@ function checkOdexMagic(dataAddr){
     return magicMatch;
 }
 
-function dumpDexToFile(isDex, begin, processName) {
+function dumpDexToFile(isDex, begin, g_processName) {
     //console.log(hexdump(begin, { offset: 0, header: false, length: 64, ansi: false }));
     var dexType;
     isDex ? dexType = "dex" : dexType = "odex";
     var magic = Memory.readUtf8String(begin).replace(/\n/g, '');
     var address = ptr(begin).add(isDex ? 0x20 : 0x1C);
     var dex_size = Memory.readInt(ptr(address));
-    var dex_path = "/data/data/" + processName + "/" + dex_size + "." + dexType;
+    var dex_path = "/data/data/" + g_processName + "/" + dex_size + "." + dexType;
     var dex_file = new File(dex_path, "wb");
 
     dex_file.write(Memory.readByteArray(begin, dex_size));
@@ -161,16 +163,16 @@ function dumpDexToFile(isDex, begin, processName) {
     dex_file.close();
 
     logPrint("magic : " + magic );
-    logPrint(dexType + "_size :" + dex_size);
-    logPrint("dump " + dexType + " success, saved path: " + dex_path + "\n");
+    logPrint("size  : " + dex_size);
+    logPrint("dumped " + dexType + " @ " + dex_path + "\n");
 }
 
-function dumpDex(moduleFuncName, processName){
+function dumpDex(moduleFuncName, g_processName){
     if(moduleFuncName !== ""){
         var hookFunction;
-        if(getAndroidVersion() > 4){
+        if (g_AndroidOSVersion > 4) {
             hookFunction = Module.findExportByName("libart.so", moduleFuncName);
-        }else{
+        } else {
             hookFunction = Module.findExportByName("libdvm.so", moduleFuncName);
             if(hookFunction == null) {
                 hookFunction = Module.findExportByName("libart.so", moduleFuncName);
@@ -204,9 +206,9 @@ function dumpDex(moduleFuncName, processName){
                     }
                 }
                 if (dexMagicMatch === true) {
-                    dumpDexToFile(dexMagicMatch, begin, processName);
+                    dumpDexToFile(dexMagicMatch, begin, g_processName);
                 } else if(odexMagicMatch === true) {
-                    dumpDexToFile(odexMagicMatch, begin, processName);
+                    dumpDexToFile(odexMagicMatch, begin, g_processName);
                 }
             },
             onLeave: function(retval) {
@@ -218,9 +220,10 @@ function dumpDex(moduleFuncName, processName){
 }
 
 // Main code
-var moduleFucntionName = getFunctionName();
-var processName = getProcessName();
+var g_AndroidOSVersion = getAndroidVersion();
+var g_moduleFunctionName = getFunctionName();
+var g_processName = getg_processName();
 
-if(moduleFucntionName !== "" && processName !== ""){
-    dumpDex(moduleFucntionName, processName);
+if(g_moduleFunctionName !== "" && g_processName !== ""){
+    dumpDex(g_moduleFunctionName, g_processName);
 }
